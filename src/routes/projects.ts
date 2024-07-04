@@ -72,5 +72,21 @@ router.get('/:id/with-report', (req, res) => {
       res.status(404).json({ error: 'Project not found' });
     }
   });
+
+// Delete project and it's all associated reports
+router.delete('/:id', (req, res) => {
+    const projectId = req.params.id;
+  
+   
+    db.run('DELETE FROM reports WHERE projectid = @id', { id: projectId });
+
+    const result = db.run('DELETE FROM projects WHERE id = @id', { id: projectId });
+  
+    if (result.changes > 0) {
+      res.json({ message: 'Project and associated reports deleted successfully' });
+    } else {
+      res.status(404).json({ error: 'Project not found' });
+    }
+  });
 export default router;
 
