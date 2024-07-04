@@ -9,6 +9,20 @@ router.get('/', (req, res) => {
     res.json(reports);
   });
   
+  //Special API Endpoint: API endpoint that retrieves all reports where the same word appears at least three times.
+  router.get('/frequent-words', (req, res) => {
+    const reports = db.query('SELECT * FROM reports');
+    const frequentReports = reports.filter((report:any) => {
+      const words = report.text.toLowerCase().split(/\s+/);
+      const wordCounts = words.reduce((acc:any, word:string) => {
+        acc[word] = (acc[word] || 0) + 1;
+        return acc;
+      }, {});
+      return Object.values(wordCounts).some((count:any) => count >= 3);
+    });
+    res.json(frequentReports);
+  });
+
   // Read single report
   router.get('/:id', (req, res) => {
     const report = db.query('SELECT * FROM reports WHERE id = @id', { id: req.params.id })[0];
