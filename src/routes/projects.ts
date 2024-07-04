@@ -50,6 +50,27 @@ router.delete('/:id', (req, res) => {
       res.status(404).json({ error: 'Project not found' });
     }
   });
+
+// Get all reports for a specific project
+//Our URL format - http://localhost:3000/projects/4.0/reports
+router.get('/:id/reports', (req, res) => {
+    const reports = db.query('SELECT * FROM reports WHERE projectid = @id', { id: req.params.id });
+    if (reports.length > 0) {
+      res.json(reports);
+    } else {
+      res.status(404).json({ message: 'No reports found for this project' });
+    }
+  });
   
+// Reading single projects with all it's associated report in single JSON object
+router.get('/:id/with-report', (req, res) => {
+    const project = db.query('SELECT * FROM projects WHERE id = @id', { id: req.params.id })[0];
+    if (project) {
+      const reports = db.query('SELECT * FROM reports WHERE projectid = @id', { id: req.params.id });
+      res.json({ ...project, reports });
+    } else {
+      res.status(404).json({ error: 'Project not found' });
+    }
+  });
 export default router;
 
